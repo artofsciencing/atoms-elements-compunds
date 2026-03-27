@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atoms, Elements & Compounds</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap');
+
+  :root {
+    --bg:       #050a14;
+    --surface:  #0c1525;
+    --panel:    #0f1e35;
+    --border:   #1a3a5c;
+    --atom:     #00d4ff;
+    --element:  #ff6b35;
+    --molecule: #7cfc00;
+    --compound: #c77dff;
+    --gold:     #ffd700;
+    --text:     #cfe8ff;
+    --muted:    #5a7fa0;
+    --glow1: 0 0 20px rgba(0,212,255,0.4);
+    --glow2: 0 0 20px rgba(255,107,53,0.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── STARFIELD ── */
+  #stars {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse at 20% 30%, rgba(0,80,160,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 70%, rgba(80,0,120,0.12) 0%, transparent 60%);
+  }
+  #stars::before {
+    content:'';
+    position:absolute;inset:0;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.5) 0%,transparent 100%),
+      radial-gradient(1px 1px at 25% 60%, rgba(255,255,255,0.4) 0%,transparent 100%),
+      radial-gradient(1px 1px at 40% 30%, rgba(255,255,255,0.6) 0%,transparent 100%),
+      radial-gradient(1px 1px at 60% 80%, rgba(255,255,255,0.3) 0%,transparent 100%),
+      radial-gradient(1px 1px at 75% 20%, rgba(255,255,255,0.5) 0%,transparent 100%),
+      radial-gradient(1px 1px at 85% 55%, rgba(255,255,255,0.4) 0%,transparent 100%),
+      radial-gradient(1px 1px at 92% 40%, rgba(255,255,255,0.6) 0%,transparent 100%),
+      radial-gradient(1px 1px at 55% 10%, rgba(255,255,255,0.3) 0%,transparent 100%),
+      radial-gradient(1px 1px at 30% 90%, rgba(255,255,255,0.5) 0%,transparent 100%),
+      radial-gradient(1px 1px at 70% 50%, rgba(255,255,255,0.4) 0%,transparent 100%);
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative; z-index: 10;
+    text-align: center;
+    padding: 28px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(0,20,50,0.95) 0%, transparent 100%);
+  }
+  header h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.2rem, 4vw, 2rem);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    background: linear-gradient(135deg, var(--atom), #7cfc00, var(--compound));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+  }
+  header p { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+
+  /* ── XP BAR ── */
+  #xp-section {
+    display: flex; align-items: center; gap: 12px;
+    max-width: 600px; margin: 12px auto 0;
+    padding: 0 12px;
+  }
+  #xp-label { font-family: 'Orbitron', sans-serif; font-size: 0.7rem; color: var(--gold); white-space: nowrap; }
+  #xp-track {
+    flex: 1; height: 10px;
+    background: var(--surface);
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  #xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--atom), var(--gold));
+    border-radius: 999px;
+    width: 0%;
+    transition: width 0.6s cubic-bezier(.34,1.56,.64,1);
+    box-shadow: 0 0 8px rgba(255,215,0,0.6);
+  }
+  #xp-num { font-family: 'Orbitron', sans-serif; font-size: 0.7rem; color: var(--gold); white-space: nowrap; }
+
+  /* ── TABS ── */
+  #tabs {
+    display: flex; justify-content: center; gap: 4px;
+    padding: 16px 12px 0;
+    position: relative; z-index: 10;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 8px 16px;
+    border-radius: 6px 6px 0 0;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .tab-btn:hover { color: var(--atom); border-color: var(--atom); }
+  .tab-btn.active {
+    background: var(--panel);
+    color: var(--atom);
+    border-color: var(--atom);
+    box-shadow: 0 -4px 12px rgba(0,212,255,0.2), inset 0 1px 0 rgba(0,212,255,0.3);
+  }
+  .tab-btn[data-tab="boss"].active { color: var(--gold); border-color: var(--gold); box-shadow: 0 -4px 12px rgba(255,215,0,0.2); }
+
+  /* ── PANELS ── */
+  #content {
+    position: relative; z-index: 5;
+    max-width: 900px; margin: 0 auto;
+    padding: 0 12px 40px;
+  }
+  .panel {
+    display: none;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 0 8px 8px 8px;
+    padding: 24px;
+    animation: fadeIn 0.3s ease;
+  }
+  .panel.active { display: block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── LEARN PANEL ── */
+  .learn-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px; margin-bottom: 24px;
+  }
+  .concept-card {
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 20px 16px;
+    border: 1px solid var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .concept-card:hover { transform: translateY(-4px); }
+  .concept-card[data-color="atom"]     { border-top: 3px solid var(--atom); }
+  .concept-card[data-color="atom"]:hover { box-shadow: var(--glow1); }
+  .concept-card[data-color="element"]  { border-top: 3px solid var(--element); }
+  .concept-card[data-color="element"]:hover { box-shadow: var(--glow2); }
+  .concept-card[data-color="molecule"] { border-top: 3px solid var(--molecule); }
+  .concept-card[data-color="molecule"]:hover { box-shadow: 0 0 20px rgba(124,252,0,0.35); }
+  .concept-card[data-color="compound"] { border-top: 3px solid var(--compound); }
+  .concept-card[data-color="compound"]:hover { box-shadow: 0 0 20px rgba(199,125,255,0.35); }
+  .card-icon { font-size: 2rem; margin-bottom: 10px; }
+  .card-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem; font-weight: 700;
+    margin-bottom: 8px; letter-spacing: 0.06em;
+  }
+  .card-title.atom     { color: var(--atom); }
+  .card-title.element  { color: var(--element); }
+  .card-title.molecule { color: var(--molecule); }
+  .card-title.compound { color: var(--compound); }
+  .card-body { font-size: 0.82rem; line-height: 1.55; color: var(--text); }
+  .card-example {
+    margin-top: 10px; padding: 8px 10px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 6px;
+    font-size: 0.78rem; color: var(--muted);
+  }
+  .card-example span { color: var(--gold); font-weight: 600; }
+
+  /* Symbols table */
+  .symbols-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  .symbols-box h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.78rem; color: var(--element);
+    margin-bottom: 12px; letter-spacing: 0.08em;
+  }
+  .sym-grid {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .sym-chip {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    display: flex; align-items: center; gap: 6px;
+    transition: transform 0.15s, border-color 0.15s;
+    cursor: default;
+  }
+  .sym-chip:hover { transform: scale(1.07); border-color: var(--element); }
+  .sym-chip .sym { font-family: 'Orbitron', sans-serif; font-weight: 700; color: var(--element); font-size: 0.9rem; }
+
+  /* Key differences table */
+  .diff-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+  .diff-table th {
+    background: var(--surface);
+    font-family: 'Orbitron', sans-serif; font-size: 0.65rem;
+    letter-spacing: 0.1em; padding: 10px 12px;
+    text-align: left; border-bottom: 2px solid var(--border);
+  }
+  .diff-table td { padding: 9px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .diff-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .pill {
+    display: inline-block; padding: 2px 8px;
+    border-radius: 999px; font-size: 0.7rem; font-weight: 600;
+  }
+  .pill.compound { background: rgba(199,125,255,0.15); color: var(--compound); border: 1px solid rgba(199,125,255,0.4); }
+  .pill.mixture  { background: rgba(0,212,255,0.1); color: var(--atom); border: 1px solid rgba(0,212,255,0.3); }
+
+  /* ── SIMULATE PANEL ── */
+  .sim-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem; color: var(--atom);
+    margin-bottom: 4px; letter-spacing: 0.06em;
+  }
+  .sim-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 20px; }
+
+  #atom-canvas-wrap {
+    position: relative;
+    width: 100%; max-width: 500px;
+    margin: 0 auto 20px;
+  }
+  #atom-canvas {
+    display: block; width: 100%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,50,100,0.6) 0%, rgba(5,10,20,0.95) 70%);
+    border: 2px solid var(--border);
+    box-shadow: var(--glow1);
+  }
+
+  .element-picker {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    justify-content: center; margin-bottom: 16px;
+  }
+  .el-btn {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem; font-weight: 700;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .el-btn:hover, .el-btn.active {
+    background: rgba(0,212,255,0.1);
+    border-color: var(--atom);
+    color: var(--atom);
+    box-shadow: var(--glow1);
+  }
+
+  #atom-info {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  #atom-info h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem; margin-bottom: 4px;
+  }
+  #atom-info .stats {
+    display: flex; justify-content: center; gap: 20px;
+    margin-top: 10px; flex-wrap: wrap;
+  }
+  .stat-box {
+    text-align: center; padding: 8px 14px;
+    background: var(--panel);
+    border-radius: 8px; border: 1px solid var(--border);
+    min-width: 80px;
+  }
+  .stat-box .val {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem; font-weight: 700;
+  }
+  .stat-box .lbl { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .proton-val   { color: #ff6b6b; }
+  .neutron-val  { color: #aaa; }
+  .electron-val { color: var(--atom); }
+
+  /* Sorting game */
+  .sort-section { margin-top: 24px; }
+  .sort-section h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.78rem; color: var(--molecule);
+    margin-bottom: 6px; letter-spacing: 0.06em;
+  }
+  .sort-section p { font-size: 0.8rem; color: var(--muted); margin-bottom: 14px; }
+  .sort-items { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .sort-item {
+    padding: 8px 14px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: grab;
+    font-size: 0.82rem; font-weight: 600;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .sort-item:hover { border-color: var(--atom); transform: scale(1.05); }
+  .sort-item.dragging { opacity: 0.4; }
+  .sort-bins {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  .sort-bin {
+    min-height: 100px;
+    border-radius: 10px;
+    padding: 12px;
+    border: 2px dashed var(--border);
+    transition: border-color 0.2s, background 0.2s;
+    text-align: center;
+  }
+  .sort-bin.drag-over { border-color: var(--atom); background: rgba(0,212,255,0.07); }
+  .sort-bin h4 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem; letter-spacing: 0.1em; margin-bottom: 8px;
+  }
+  .sort-bin.element-bin h4  { color: var(--element); }
+  .sort-bin.compound-bin h4 { color: var(--compound); }
+  .sort-bin.mixture-bin h4  { color: var(--molecule); }
+  .sort-bin .dropped {
+    display: flex; flex-wrap: wrap; gap: 4px; justify-content: center;
+  }
+  .sort-bin .dropped span {
+    background: rgba(255,255,255,0.08);
+    border-radius: 5px; padding: 3px 8px; font-size: 0.75rem;
+  }
+  #sort-feedback {
+    text-align: center; padding: 10px;
+    font-family: 'Orbitron', sans-serif; font-size: 0.78rem;
+    display: none; border-radius: 8px; margin-top: 10px;
+  }
+  #sort-feedback.correct { background: rgba(124,252,0,0.1); color: var(--molecule); border: 1px solid var(--molecule); display: block; }
+  #sort-feedback.wrong   { background: rgba(255,100,100,0.1); color: #ff8080; border: 1px solid #ff5555; display: block; }
+  .sort-check-btn {
+    display: block; margin: 12px auto 0;
+    font-family: 'Orbitron', sans-serif; font-size: 0.7rem;
+    padding: 10px 24px; border-radius: 8px;
+    background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(0,212,255,0.05));
+    border: 1px solid var(--atom); color: var(--atom);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .sort-check-btn:hover { background: rgba(0,212,255,0.2); box-shadow: var(--glow1); }
+
+  /* ── QUIZ PANEL ── */
+  #quiz-container { max-width: 640px; margin: 0 auto; }
+  .q-counter {
+    font-family: 'Orbitron', sans-serif; font-size: 0.65rem;
+    color: var(--muted); margin-bottom: 8px; letter-spacing: 0.1em;
+  }
+  .q-progress-track {
+    height: 4px; background: var(--surface); border-radius: 999px; margin-bottom: 20px; overflow: hidden;
+  }
+  .q-progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--atom), var(--molecule));
+    border-radius: 999px; transition: width 0.4s ease;
+  }
+  .q-text {
+    font-size: 1rem; font-weight: 600; line-height: 1.5;
+    margin-bottom: 20px; color: #e0f4ff;
+  }
+  .q-options { display: grid; gap: 10px; }
+  .q-opt {
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem; line-height: 1.4;
+    text-align: left;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .q-opt:hover { border-color: var(--atom); background: rgba(0,212,255,0.08); }
+  .q-opt.correct { border-color: var(--molecule); background: rgba(124,252,0,0.1); color: var(--molecule); }
+  .q-opt.wrong   { border-color: #ff5555; background: rgba(255,85,85,0.1); color: #ff8080; }
+  .q-opt.show-correct { border-color: var(--molecule); background: rgba(124,252,0,0.06); }
+  .q-opt .opt-letter {
+    width: 24px; height: 24px; flex-shrink: 0;
+    border-radius: 50%; border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', sans-serif; font-size: 0.65rem; font-weight: 700;
+  }
+  .q-feedback {
+    margin-top: 16px; padding: 12px 16px;
+    border-radius: 8px; font-size: 0.82rem; line-height: 1.5;
+    display: none;
+  }
+  .q-feedback.show { display: block; }
+  .q-feedback.correct { background: rgba(124,252,0,0.08); border: 1px solid rgba(124,252,0,0.3); color: #a8ff70; }
+  .q-feedback.wrong   { background: rgba(255,85,85,0.08); border: 1px solid rgba(255,85,85,0.3); color: #ffaaaa; }
+  .q-next-btn {
+    margin-top: 16px;
+    font-family: 'Orbitron', sans-serif; font-size: 0.7rem;
+    padding: 10px 24px; border-radius: 8px;
+    background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(0,212,255,0.05));
+    border: 1px solid var(--atom); color: var(--atom);
+    cursor: pointer; display: none; transition: all 0.2s;
+  }
+  .q-next-btn.show { display: inline-block; }
+  .q-next-btn:hover { background: rgba(0,212,255,0.25); box-shadow: var(--glow1); }
+  #quiz-result {
+    text-align: center; padding: 30px 20px; display: none;
+  }
+  #quiz-result.show { display: block; }
+  #quiz-result .big-score {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3rem; font-weight: 900;
+    background: linear-gradient(135deg, var(--gold), var(--element));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  #quiz-result p { margin: 8px 0; color: var(--muted); font-size: 0.85rem; }
+  .restart-btn {
+    margin-top: 20px;
+    font-family: 'Orbitron', sans-serif; font-size: 0.7rem;
+    padding: 12px 28px; border-radius: 8px;
+    background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,107,53,0.1));
+    border: 1px solid var(--gold); color: var(--gold);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .restart-btn:hover { box-shadow: 0 0 20px rgba(255,215,0,0.3); }
+
+  /* ── BOSS PANEL ── */
+  #boss-intro { text-align: center; padding: 20px 0; }
+  #boss-intro .boss-icon { font-size: 4rem; margin-bottom: 12px; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+  #boss-intro h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem; color: var(--gold); margin-bottom: 8px;
+  }
+  #boss-intro p { font-size: 0.82rem; color: var(--muted); margin-bottom: 20px; }
+  .start-boss-btn {
+    font-family: 'Orbitron', sans-serif; font-size: 0.8rem; font-weight: 700;
+    padding: 14px 32px; border-radius: 10px;
+    background: linear-gradient(135deg, rgba(255,215,0,0.25), rgba(255,107,53,0.15));
+    border: 2px solid var(--gold); color: var(--gold);
+    cursor: pointer; transition: all 0.25s;
+    box-shadow: 0 0 20px rgba(255,215,0,0.2);
+    letter-spacing: 0.08em;
+  }
+  .start-boss-btn:hover { box-shadow: 0 0 40px rgba(255,215,0,0.4); transform: scale(1.03); }
+
+  #boss-game { display: none; }
+  #boss-timer-bar {
+    height: 8px; background: var(--surface); border-radius: 999px;
+    overflow: hidden; margin-bottom: 20px;
+  }
+  #boss-timer-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--molecule), var(--gold), var(--element), #ff4444);
+    border-radius: 999px;
+    transition: width 0.1s linear;
+  }
+  #boss-q-num {
+    font-family: 'Orbitron', sans-serif; font-size: 0.65rem;
+    color: var(--gold); margin-bottom: 4px; letter-spacing: 0.1em;
+  }
+  #boss-question {
+    font-size: 1rem; font-weight: 600; color: #e0f4ff;
+    margin-bottom: 20px; min-height: 48px; line-height: 1.5;
+  }
+  #boss-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .boss-opt {
+    padding: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer; font-size: 0.82rem; text-align: center;
+    transition: all 0.15s; font-weight: 500;
+  }
+  .boss-opt:hover { border-color: var(--gold); background: rgba(255,215,0,0.07); }
+  .boss-opt.correct { border-color: var(--molecule); background: rgba(124,252,0,0.12); color: var(--molecule); }
+  .boss-opt.wrong   { border-color: #ff5555; background: rgba(255,85,85,0.12); color: #ff8080; }
+  .boss-opt.reveal  { border-color: var(--molecule); background: rgba(124,252,0,0.06); }
+  #boss-streak {
+    text-align: center; margin-top: 12px;
+    font-family: 'Orbitron', sans-serif; font-size: 0.7rem; color: var(--gold);
+  }
+  #boss-result { display: none; text-align: center; padding: 30px 20px; }
+  #boss-result.show { display: block; }
+  #boss-result .trophy { font-size: 4rem; margin-bottom: 12px; }
+  #boss-result h2 {
+    font-family: 'Orbitron', sans-serif; font-size: 1.3rem;
+    color: var(--gold); margin-bottom: 8px;
+  }
+  #boss-result .big-pct {
+    font-family: 'Orbitron', sans-serif; font-size: 3rem;
+    font-weight: 900; background: linear-gradient(135deg, var(--gold), var(--element));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  #boss-result p { color: var(--muted); font-size: 0.82rem; margin: 6px 0; }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(60px);
+    background: linear-gradient(135deg, rgba(0,50,80,0.98), rgba(0,30,60,0.98));
+    border: 1px solid var(--atom);
+    border-radius: 12px; padding: 12px 24px;
+    font-family: 'Orbitron', sans-serif; font-size: 0.75rem;
+    color: var(--atom); z-index: 1000;
+    transition: transform 0.4s cubic-bezier(.34,1.56,.64,1), opacity 0.4s;
+    opacity: 0; box-shadow: var(--glow1);
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<header>
+  <h1>⚛ Atoms · Elements · Compounds</h1>
+  <p>KS3 Chemistry &nbsp;|&nbsp; Interactive Lesson</p>
+  <div id="xp-section">
+    <span id="xp-label">LVL <span id="lvl-num">1</span></span>
+    <div id="xp-track"><div id="xp-fill"></div></div>
+    <span id="xp-num">0 / 100 XP</span>
+  </div>
+</header>
+
+<div id="tabs">
+  <button class="tab-btn active" data-tab="learn">📚 Learn</button>
+  <button class="tab-btn" data-tab="simulate">⚡ Explore</button>
+  <button class="tab-btn" data-tab="quiz">🧪 Quiz</button>
+  <button class="tab-btn" data-tab="boss">💥 Boss</button>
+</div>
+
+<div id="content">
+
+  <!-- ═══════════ LEARN ═══════════ -->
+  <div class="panel active" id="panel-learn">
+    <div class="learn-grid">
+
+      <div class="concept-card" data-color="atom">
+        <div class="card-icon">⚛️</div>
+        <div class="card-title atom">What is an Atom?</div>
+        <div class="card-body">
+          An atom is the <strong>smallest particle of an element</strong> that still has the chemical properties of that element. Everything around you — air, water, metal — is made of atoms!
+          <br><br>
+          Every atom has a <strong>nucleus</strong> (containing protons ➕ and neutrons ⚪) surrounded by <strong>electrons</strong> ➖ orbiting in shells.
+        </div>
+        <div class="card-example">
+          ⚡ Protons: <span>positive charge</span><br>
+          ⚪ Neutrons: <span>no charge</span><br>
+          🔵 Electrons: <span>negative charge</span>
+        </div>
+      </div>
+
+      <div class="concept-card" data-color="element">
+        <div class="card-icon">🔶</div>
+        <div class="card-title element">Elements</div>
+        <div class="card-body">
+          An element is a <strong>pure substance made of only one type of atom</strong>. There are over <strong>100 elements</strong> — each has a unique chemical symbol of 1 or 2 letters.
+          <br><br>
+          Elements are either <strong>metals</strong> (e.g. iron, gold, sodium) or <strong>non-metals</strong> (e.g. oxygen, carbon, nitrogen).
+        </div>
+        <div class="card-example">
+          Examples: <span>H</span> (Hydrogen) · <span>O</span> (Oxygen) · <span>Fe</span> (Iron) · <span>Na</span> (Sodium) · <span>Au</span> (Gold)
+        </div>
+      </div>
+
+      <div class="concept-card" data-color="molecule">
+        <div class="card-icon">🔗</div>
+        <div class="card-title molecule">Molecules</div>
+        <div class="card-body">
+          A molecule is formed when <strong>two or more atoms bond together</strong>. Molecules can be made from atoms of the <em>same</em> element or <em>different</em> elements.
+          <br><br>
+          The number of atoms is shown in the chemical formula as a <strong>subscript number</strong>.
+        </div>
+        <div class="card-example">
+          <span>H₂</span> — 2 hydrogen atoms<br>
+          <span>O₂</span> — 2 oxygen atoms<br>
+          <span>H₂O</span> — 2 hydrogen + 1 oxygen
+        </div>
+      </div>
+
+      <div class="concept-card" data-color="compound">
+        <div class="card-icon">🧬</div>
+        <div class="card-title compound">Compounds</div>
+        <div class="card-body">
+          A compound is a substance made from <strong>two or more different elements chemically combined</strong> in fixed ratios. Its properties are completely different from the elements it contains!
+          <br><br>
+          Compounds can only be separated by <strong>chemical reactions</strong>.
+        </div>
+        <div class="card-example">
+          <span>NaCl</span> — Sodium + Chlorine → Table salt<br>
+          <span>H₂O</span> — Hydrogen + Oxygen → Water<br>
+          <span>CO₂</span> — Carbon + Oxygen → Carbon dioxide
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Chemical Symbols -->
+    <div class="symbols-box">
+      <h3>⚗️ Common Chemical Symbols</h3>
+      <div class="sym-grid">
+        <div class="sym-chip"><span class="sym">H</span> Hydrogen</div>
+        <div class="sym-chip"><span class="sym">He</span> Helium</div>
+        <div class="sym-chip"><span class="sym">C</span> Carbon</div>
+        <div class="sym-chip"><span class="sym">N</span> Nitrogen</div>
+        <div class="sym-chip"><span class="sym">O</span> Oxygen</div>
+        <div class="sym-chip"><span class="sym">Na</span> Sodium</div>
+        <div class="sym-chip"><span class="sym">Mg</span> Magnesium</div>
+        <div class="sym-chip"><span class="sym">Al</span> Aluminium</div>
+        <div class="sym-chip"><span class="sym">S</span> Sulphur</div>
+        <div class="sym-chip"><span class="sym">Cl</span> Chlorine</div>
+        <div class="sym-chip"><span class="sym">K</span> Potassium</div>
+        <div class="sym-chip"><span class="sym">Ca</span> Calcium</div>
+        <div class="sym-chip"><span class="sym">Fe</span> Iron</div>
+        <div class="sym-chip"><span class="sym">Cu</span> Copper</div>
+        <div class="sym-chip"><span class="sym">Au</span> Gold</div>
+        <div class="sym-chip"><span class="sym">Ag</span> Silver</div>
+      </div>
+    </div>
+
+    <!-- Compound vs Mixture -->
+    <div class="symbols-box">
+      <h3>⚔️ Compound vs Mixture</h3>
+      <table class="diff-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th><span style="color:var(--compound)">Compound</span></th>
+            <th><span style="color:var(--molecule)">Mixture</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>How made</td><td>Chemical reaction</td><td>Physical mixing</td></tr>
+          <tr><td>Fixed ratio?</td><td>✅ Yes, always</td><td>❌ No, can vary</td></tr>
+          <tr><td>Separation</td><td>Chemical reaction only</td><td>Physical methods (filtering, etc.)</td></tr>
+          <tr><td>Properties</td><td>Different from elements</td><td>Each substance keeps its own</td></tr>
+          <tr><td>Example</td>
+              <td><span class="pill compound">H₂O (water)</span></td>
+              <td><span class="pill mixture">Salt + Sand</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════ SIMULATE ═══════════ -->
+  <div class="panel" id="panel-simulate">
+    <div class="sim-title">⚡ Atom Explorer</div>
+    <div class="sim-sub">Select an element to see its atomic structure. Click the canvas to animate!</div>
+
+    <div class="element-picker" id="el-picker">
+      <button class="el-btn active" data-z="1" data-name="Hydrogen" data-sym="H" data-n="0" data-col="#00d4ff">H</button>
+      <button class="el-btn" data-z="2" data-name="Helium" data-sym="He" data-n="2" data-col="#ffd700">He</button>
+      <button class="el-btn" data-z="6" data-name="Carbon" data-sym="C" data-n="6" data-col="#aaaaaa">C</button>
+      <button class="el-btn" data-z="8" data-name="Oxygen" data-sym="O" data-n="8" data-col="#7cfc00">O</button>
+      <button class="el-btn" data-z="11" data-name="Sodium" data-sym="Na" data-n="12" data-col="#ff6b35">Na</button>
+      <button class="el-btn" data-z="17" data-name="Chlorine" data-sym="Cl" data-n="18" data-col="#c77dff">Cl</button>
+      <button class="el-btn" data-z="26" data-name="Iron" data-sym="Fe" data-n="30" data-col="#ff8c42">Fe</button>
+    </div>
+
+    <div id="atom-canvas-wrap">
+      <canvas id="atom-canvas" width="400" height="400"></canvas>
+    </div>
+
+    <div id="atom-info">
+      <h3 id="ai-name" style="color:var(--atom)">Hydrogen <span style="font-size:0.75rem;color:var(--muted)">(H)</span></h3>
+      <div class="stats">
+        <div class="stat-box"><div class="val proton-val" id="ai-p">1</div><div class="lbl">Protons</div></div>
+        <div class="stat-box"><div class="val neutron-val" id="ai-n">0</div><div class="lbl">Neutrons</div></div>
+        <div class="stat-box"><div class="val electron-val" id="ai-e">1</div><div class="lbl">Electrons</div></div>
+        <div class="stat-box"><div class="val" style="color:var(--gold)" id="ai-mass">1</div><div class="lbl">Mass No.</div></div>
+      </div>
+    </div>
+
+    <!-- Sorting Game -->
+    <div class="sort-section">
+      <h3>🗂️ Sort the Substances</h3>
+      <p>Drag each substance into the correct category. +15 XP for a perfect sort!</p>
+      <div class="sort-items" id="sort-items">
+        <div class="sort-item" draggable="true" data-cat="element">Oxygen (O₂)</div>
+        <div class="sort-item" draggable="true" data-cat="compound">Water (H₂O)</div>
+        <div class="sort-item" draggable="true" data-cat="mixture">Salt + Sand</div>
+        <div class="sort-item" draggable="true" data-cat="element">Iron (Fe)</div>
+        <div class="sort-item" draggable="true" data-cat="compound">Table Salt (NaCl)</div>
+        <div class="sort-item" draggable="true" data-cat="mixture">Air</div>
+        <div class="sort-item" draggable="true" data-cat="compound">Carbon dioxide (CO₂)</div>
+        <div class="sort-item" draggable="true" data-cat="element">Gold (Au)</div>
+      </div>
+      <div class="sort-bins">
+        <div class="sort-bin element-bin" data-bin="element">
+          <h4>🔶 Element</h4>
+          <div class="dropped" id="bin-element"></div>
+        </div>
+        <div class="sort-bin compound-bin" data-bin="compound">
+          <h4>🧬 Compound</h4>
+          <div class="dropped" id="bin-compound"></div>
+        </div>
+        <div class="sort-bin mixture-bin" data-bin="mixture">
+          <h4>🌀 Mixture</h4>
+          <div class="dropped" id="bin-mixture"></div>
+        </div>
+      </div>
+      <div id="sort-feedback"></div>
+      <button class="sort-check-btn" onclick="checkSort()">✅ Check My Sort</button>
+    </div>
+  </div>
+
+  <!-- ═══════════ QUIZ ═══════════ -->
+  <div class="panel" id="panel-quiz">
+    <div id="quiz-container">
+      <div id="quiz-questions">
+        <div class="q-counter">QUESTION <span id="q-num">1</span> OF 10</div>
+        <div class="q-progress-track"><div class="q-progress-fill" id="q-prog" style="width:10%"></div></div>
+        <div class="q-text" id="q-text"></div>
+        <div class="q-options" id="q-opts"></div>
+        <div class="q-feedback" id="q-fb"></div>
+        <button class="q-next-btn" id="q-next" onclick="nextQuestion()">NEXT ›</button>
+      </div>
+      <div id="quiz-result">
+        <div class="big-score" id="quiz-score-display">8/10</div>
+        <p id="quiz-result-msg"></p>
+        <p style="color:var(--atom);margin-top:10px;" id="quiz-xp-earned"></p>
+        <button class="restart-btn" onclick="restartQuiz()">🔄 RETRY QUIZ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ BOSS ═══════════ -->
+  <div class="panel" id="panel-boss">
+    <div id="boss-intro">
+      <div class="boss-icon">🧪💥</div>
+      <h2>BOSS CHALLENGE</h2>
+      <p>10 rapid-fire questions, 8 seconds each.<br>Prove your mastery of Atoms, Elements & Compounds!</p>
+      <button class="start-boss-btn" onclick="startBoss()">⚔️ START CHALLENGE</button>
+    </div>
+    <div id="boss-game">
+      <div id="boss-timer-bar"><div id="boss-timer-fill" style="width:100%"></div></div>
+      <div id="boss-q-num">QUESTION 1 / 10</div>
+      <div id="boss-question"></div>
+      <div id="boss-options"></div>
+      <div id="boss-streak"></div>
+    </div>
+    <div id="boss-result">
+      <div class="trophy" id="boss-trophy">🏆</div>
+      <h2 id="boss-title"></h2>
+      <div class="big-pct" id="boss-pct"></div>
+      <p id="boss-msg"></p>
+      <p style="color:var(--gold);margin-top:8px;" id="boss-xp-msg"></p>
+      <button class="restart-btn" onclick="resetBoss()" style="margin-top:16px;">🔄 TRY AGAIN</button>
+    </div>
+  </div>
+
+</div><!-- #content -->
+
+<div id="toast"></div>
+
+<script>
+// ══════════════ XP SYSTEM ══════════════
+let xp = 0;
+const xpPerLevel = 100;
+
+function addXP(amount, label) {
+  xp += amount;
+  const lvl = Math.floor(xp / xpPerLevel) + 1;
+  const progress = (xp % xpPerLevel) / xpPerLevel * 100;
+  document.getElementById('xp-fill').style.width = progress + '%';
+  document.getElementById('xp-num').textContent = (xp % xpPerLevel) + ' / 100 XP';
+  document.getElementById('lvl-num').textContent = lvl;
+  showToast(`+${amount} XP${label ? ' — ' + label : ''}!`);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ══════════════ TABS ══════════════
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ══════════════ ATOM CANVAS ══════════════
+const canvas = document.getElementById('atom-canvas');
+const ctx = canvas.getContext('2d');
+let currentElement = { z: 1, name: 'Hydrogen', sym: 'H', n: 0, col: '#00d4ff' };
+let animFrame;
+let t = 0;
+let electronSpeeds = [];
+
+const electronConfig = z => {
+  const shells = [];
+  let rem = z;
+  const caps = [2, 8, 8, 18];
+  for (let c of caps) {
+    if (rem <= 0) break;
+    const fill = Math.min(rem, c);
+    shells.push(fill);
+    rem -= fill;
+  }
+  return shells;
+};
+
+function initSpeeds(shells) {
+  electronSpeeds = shells.map((n, si) =>
+    Array.from({length: n}, (_, i) => 0.6 / (si + 1) * (1 + Math.random() * 0.2 - 0.1))
+  );
+}
+
+function drawAtom() {
+  const w = canvas.width, h = canvas.height, cx = w/2, cy = h/2;
+  ctx.clearRect(0, 0, w, h);
+  t += 0.016;
+
+  const shells = electronConfig(currentElement.z);
+  const maxShells = shells.length;
+  const maxR = Math.min(cx, cy) * 0.88;
+  const shellRadii = shells.map((_, i) => (maxR / (maxShells + 0.5)) * (i + 1));
+
+  // Draw orbital paths
+  shells.forEach((_, i) => {
+    ctx.beginPath();
+    ctx.arc(cx, cy, shellRadii[i], 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // Draw nucleus glow
+  const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 22);
+  grad.addColorStop(0, currentElement.col + 'ff');
+  grad.addColorStop(0.5, currentElement.col + '88');
+  grad.addColorStop(1, 'transparent');
+  ctx.beginPath(); ctx.arc(cx, cy, 22, 0, Math.PI * 2);
+  ctx.fillStyle = grad; ctx.fill();
+
+  // Symbol in nucleus
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 14px Orbitron, monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(currentElement.sym, cx, cy);
+
+  // Draw electrons
+  shells.forEach((count, si) => {
+    const r = shellRadii[si];
+    for (let j = 0; j < count; j++) {
+      const baseAngle = (2 * Math.PI / count) * j;
+      const speed = electronSpeeds[si] ? electronSpeeds[si][j] : 0.5 / (si + 1);
+      const angle = baseAngle + t * speed;
+      const ex = cx + r * Math.cos(angle);
+      const ey = cy + r * Math.sin(angle);
+
+      // Glow
+      const eGrad = ctx.createRadialGradient(ex, ey, 0, ex, ey, 7);
+      eGrad.addColorStop(0, 'rgba(0,212,255,0.9)');
+      eGrad.addColorStop(1, 'transparent');
+      ctx.beginPath(); ctx.arc(ex, ey, 7, 0, Math.PI * 2);
+      ctx.fillStyle = eGrad; ctx.fill();
+
+      // Core dot
+      ctx.beginPath(); ctx.arc(ex, ey, 3, 0, Math.PI * 2);
+      ctx.fillStyle = '#00d4ff'; ctx.fill();
+    }
+  });
+
+  animFrame = requestAnimationFrame(drawAtom);
+}
+
+function setElement(btn) {
+  cancelAnimationFrame(animFrame);
+  document.querySelectorAll('.el-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentElement = {
+    z: +btn.dataset.z,
+    name: btn.dataset.name,
+    sym: btn.dataset.sym,
+    n: +btn.dataset.n,
+    col: btn.dataset.col
+  };
+  const shells = electronConfig(currentElement.z);
+  initSpeeds(shells);
+  document.getElementById('ai-name').innerHTML = `${currentElement.name} <span style="font-size:0.75rem;color:var(--muted)">(${currentElement.sym})</span>`;
+  document.getElementById('ai-name').style.color = currentElement.col;
+  document.getElementById('ai-p').textContent = currentElement.z;
+  document.getElementById('ai-n').textContent = currentElement.n;
+  document.getElementById('ai-e').textContent = currentElement.z;
+  document.getElementById('ai-mass').textContent = currentElement.z + currentElement.n;
+  drawAtom();
+  addXP(5, currentElement.name + ' explored');
+}
+
+document.querySelectorAll('.el-btn').forEach(btn => {
+  btn.addEventListener('click', () => setElement(btn));
+});
+
+initSpeeds(electronConfig(1));
+drawAtom();
+
+// ══════════════ DRAG & DROP SORT ══════════════
+let draggedItem = null;
+const binContents = { element: [], compound: [], mixture: [] };
+
+document.querySelectorAll('.sort-item').forEach(item => {
+  item.addEventListener('dragstart', e => {
+    draggedItem = item;
+    setTimeout(() => item.classList.add('dragging'), 0);
+  });
+  item.addEventListener('dragend', () => { item.classList.remove('dragging'); });
+});
+
+document.querySelectorAll('.sort-bin').forEach(bin => {
+  bin.addEventListener('dragover', e => { e.preventDefault(); bin.classList.add('drag-over'); });
+  bin.addEventListener('dragleave', () => bin.classList.remove('drag-over'));
+  bin.addEventListener('drop', e => {
+    e.preventDefault();
+    bin.classList.remove('drag-over');
+    if (draggedItem) {
+      const binId = bin.dataset.bin;
+      const label = draggedItem.textContent;
+      const origCat = draggedItem.dataset.cat;
+      binContents[binId].push({ label, origCat });
+      const span = document.createElement('span');
+      span.textContent = label;
+      document.getElementById('bin-' + binId).appendChild(span);
+      draggedItem.style.display = 'none';
+      draggedItem = null;
+    }
+  });
+});
+
+function checkSort() {
+  let total = 0, correct = 0;
+  for (const [bin, items] of Object.entries(binContents)) {
+    for (const item of items) {
+      total++;
+      if (item.origCat === bin) correct++;
+    }
+  }
+  const fb = document.getElementById('sort-feedback');
+  if (total === 0) { fb.className = 'wrong'; fb.textContent = '⚠️ Drag items into the bins first!'; return; }
+  if (correct === total) {
+    fb.className = 'correct';
+    fb.textContent = `🎉 Perfect! All ${total} items sorted correctly!`;
+    addXP(15, 'Perfect Sort');
+  } else {
+    fb.className = 'wrong';
+    fb.textContent = `❌ ${correct}/${total} correct. Try rearranging the wrong ones!`;
+  }
+}
+
+// ══════════════ QUIZ ══════════════
+const allQuestions = [
+  { q: "What is the smallest particle of an element that retains its chemical properties?", opts: ["Molecule", "Atom", "Compound", "Neutron"], ans: 1, exp: "An atom is the smallest particle of an element. It cannot be broken down further by chemical means." },
+  { q: "What is the chemical symbol for Sodium?", opts: ["S", "So", "Na", "N"], ans: 2, exp: "Sodium's symbol is Na, from its Latin name 'Natrium'. S is the symbol for Sulphur!" },
+  { q: "Which of these is a compound?", opts: ["Iron (Fe)", "Oxygen (O₂)", "Water (H₂O)", "Gold (Au)"], ans: 2, exp: "H₂O (water) is a compound — it contains hydrogen AND oxygen atoms chemically bonded together." },
+  { q: "How many electrons does a Carbon atom have?", opts: ["2", "6", "8", "12"], ans: 1, exp: "Carbon has atomic number 6, so it has 6 protons and 6 electrons. Its electron arrangement is 2,4." },
+  { q: "Which statement about a compound is CORRECT?", opts: ["It contains only one type of atom", "It can be separated by filtering", "Its properties are the same as its elements", "Its elements are in a fixed ratio"], ans: 3, exp: "In a compound, elements are always present in a fixed ratio, e.g. H₂O always has 2 hydrogen to 1 oxygen." },
+  { q: "Air is an example of a...", opts: ["Element", "Compound", "Mixture", "Pure substance"], ans: 2, exp: "Air is a mixture — it contains nitrogen, oxygen, argon and other gases, not chemically combined, and its composition can vary." },
+  { q: "What is the mass number of Sodium (11 protons, 12 neutrons)?", opts: ["11", "12", "23", "1"], ans: 2, exp: "Mass number = protons + neutrons = 11 + 12 = 23. This is written at the top of the element symbol." },
+  { q: "Which of these is an element?", opts: ["Carbon dioxide (CO₂)", "Table salt (NaCl)", "Water (H₂O)", "Chlorine (Cl₂)"], ans: 3, exp: "Cl₂ (chlorine gas) is an element — it contains only chlorine atoms. CO₂, NaCl and H₂O are all compounds." },
+  { q: "How are atoms arranged in a molecule of hydrogen gas (H₂)?", opts: ["1 hydrogen atom alone", "2 hydrogen atoms bonded together", "2 different elements bonded", "A hydrogen atom in a compound"], ans: 1, exp: "H₂ is a diatomic molecule — two hydrogen atoms bonded together. Both atoms are the same element." },
+  { q: "What part of an atom has a positive charge?", opts: ["Electron", "Neutron", "Proton", "Shell"], ans: 2, exp: "Protons have a positive (+) charge. Neutrons have no charge. Electrons have a negative (−) charge." },
+];
+
+let quizQs, qIdx, qScore;
+
+function shuffleArray(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+function startQuiz() {
+  quizQs = shuffleArray(allQuestions).slice(0, 10);
+  qIdx = 0; qScore = 0;
+  document.getElementById('quiz-questions').style.display = 'block';
+  document.getElementById('quiz-result').classList.remove('show');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = quizQs[qIdx];
+  document.getElementById('q-num').textContent = qIdx + 1;
+  document.getElementById('q-prog').style.width = ((qIdx + 1) / 10 * 100) + '%';
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('q-fb').className = 'q-feedback';
+  document.getElementById('q-next').className = 'q-next-btn';
+
+  const opts = document.getElementById('q-opts');
+  opts.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'q-opt';
+    btn.innerHTML = `<span class="opt-letter">${letters[i]}</span>${opt}`;
+    btn.addEventListener('click', () => selectAnswer(i, btn));
+    opts.appendChild(btn);
+  });
+}
+
+function selectAnswer(idx, btn) {
+  const q = quizQs[qIdx];
+  document.querySelectorAll('.q-opt').forEach(b => b.style.pointerEvents = 'none');
+  const fb = document.getElementById('q-fb');
+  const all = document.querySelectorAll('.q-opt');
+
+  if (idx === q.ans) {
+    btn.classList.add('correct');
+    qScore++;
+    fb.className = 'q-feedback correct show';
+    fb.textContent = '✅ Correct! ' + q.exp;
+    addXP(10, 'Correct answer');
+  } else {
+    btn.classList.add('wrong');
+    all[q.ans].classList.add('show-correct');
+    fb.className = 'q-feedback wrong show';
+    fb.textContent = '❌ Not quite. ' + q.exp;
+  }
+  document.getElementById('q-next').className = 'q-next-btn show';
+}
+
+function nextQuestion() {
+  qIdx++;
+  if (qIdx >= quizQs.length) {
+    showQuizResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showQuizResult() {
+  document.getElementById('quiz-questions').style.display = 'none';
+  const res = document.getElementById('quiz-result');
+  res.classList.add('show');
+  document.getElementById('quiz-score-display').textContent = qScore + '/10';
+  const msgs = ['Keep practising! 💪', 'Good effort! 📚', 'Well done! ⭐', 'Excellent! 🌟', 'PERFECT! 🏆'];
+  const m = msgs[Math.floor(qScore / 2.5)];
+  document.getElementById('quiz-result-msg').textContent = m;
+  const bonus = qScore * 5;
+  addXP(bonus, 'Quiz complete');
+  document.getElementById('quiz-xp-earned').textContent = `+${bonus} XP earned`;
+}
+
+function restartQuiz() { startQuiz(); }
+
+startQuiz();
+
+// ══════════════ BOSS CHALLENGE ══════════════
+const bossQuestions = shuffleArray([
+  ...allQuestions,
+  { q: "Which subatomic particle has no electric charge?", opts: ["Proton", "Electron", "Neutron", "Ion"], ans: 2, exp: "Neutrons are neutral — they have zero charge." },
+  { q: "What is the chemical formula for table salt?", opts: ["KCl", "NaCl", "NaOH", "CaCl₂"], ans: 1, exp: "Table salt is sodium chloride: Na (sodium) + Cl (chlorine) → NaCl." },
+  { q: "Electrons orbit the nucleus in...", opts: ["Rings", "Shells", "Layers", "Orbits only"], ans: 1, exp: "Electrons are arranged in shells (also called energy levels) around the nucleus." },
+  { q: "Which is true about a mixture?", opts: ["Elements combine chemically", "Fixed composition always", "Can be separated physically", "Has new properties"], ans: 2, exp: "Mixtures can be separated by physical means such as filtering, distillation, or evaporation." },
+  { q: "Maximum electrons in the first shell?", opts: ["1", "2", "4", "8"], ans: 1, exp: "The first electron shell can hold a maximum of 2 electrons." },
+]).slice(0, 10);
+
+let bossIdx = 0, bossScore = 0, bossStreak = 0, bossTimer, bossTimeLeft, bossAnswered;
+
+function startBoss() {
+  bossIdx = 0; bossScore = 0; bossStreak = 0;
+  document.getElementById('boss-intro').style.display = 'none';
+  document.getElementById('boss-game').style.display = 'block';
+  document.getElementById('boss-result').classList.remove('show');
+  renderBossQ();
+}
+
+function renderBossQ() {
+  if (bossIdx >= bossQuestions.length) { endBoss(); return; }
+  bossAnswered = false;
+  const q = bossQuestions[bossIdx];
+  document.getElementById('boss-q-num').textContent = `QUESTION ${bossIdx + 1} / ${bossQuestions.length}`;
+  document.getElementById('boss-question').textContent = q.q;
+  document.getElementById('boss-streak').textContent = bossStreak > 1 ? `🔥 ${bossStreak} streak!` : '';
+
+  const opts = document.getElementById('boss-options');
+  opts.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'boss-opt';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => selectBossAnswer(i, btn));
+    opts.appendChild(btn);
+  });
+
+  // Timer
+  clearInterval(bossTimer);
+  bossTimeLeft = 8;
+  document.getElementById('boss-timer-fill').style.width = '100%';
+  bossTimer = setInterval(() => {
+    bossTimeLeft -= 0.1;
+    document.getElementById('boss-timer-fill').style.width = (bossTimeLeft / 8 * 100) + '%';
+    if (bossTimeLeft <= 0) {
+      clearInterval(bossTimer);
+      if (!bossAnswered) {
+        bossAnswered = true;
+        bossStreak = 0;
+        document.querySelectorAll('.boss-opt')[q.ans].classList.add('reveal');
+        document.querySelectorAll('.boss-opt').forEach(b => b.style.pointerEvents = 'none');
+        setTimeout(() => { bossIdx++; renderBossQ(); }, 1200);
+      }
+    }
+  }, 100);
+}
+
+function selectBossAnswer(idx, btn) {
+  if (bossAnswered) return;
+  bossAnswered = true;
+  clearInterval(bossTimer);
+  const q = bossQuestions[bossIdx];
+  document.querySelectorAll('.boss-opt').forEach(b => b.style.pointerEvents = 'none');
+  if (idx === q.ans) {
+    btn.classList.add('correct');
+    bossScore++; bossStreak++;
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.boss-opt')[q.ans].classList.add('reveal');
+    bossStreak = 0;
+  }
+  document.getElementById('boss-streak').textContent = bossStreak > 1 ? `🔥 ${bossStreak} streak!` : '';
+  setTimeout(() => { bossIdx++; renderBossQ(); }, 900);
+}
+
+function endBoss() {
+  clearInterval(bossTimer);
+  document.getElementById('boss-game').style.display = 'none';
+  const res = document.getElementById('boss-result');
+  res.classList.add('show');
+  const pct = Math.round(bossScore / bossQuestions.length * 100);
+  document.getElementById('boss-pct').textContent = pct + '%';
+  const trophies = ['😓','🙁','😐','🙂','😀','⭐','🌟','💫','🏅','🥇','🏆'];
+  const tidx = Math.round(pct / 10);
+  document.getElementById('boss-trophy').textContent = trophies[tidx] || '🏆';
+  const titles = ['Keep Going!','Almost There!','Decent Effort','Solid Work!','Great Job!','Excellent!','Superstar!','Champion!','Master!','Legendary!','PERFECT!'];
+  document.getElementById('boss-title').textContent = titles[tidx] || 'Champion!';
+  const msgs = [`You scored ${bossScore}/${bossQuestions.length}`, 'Review the Learn tab and try again to improve your score.', 'Science champion in the making!'];
+  document.getElementById('boss-msg').textContent = `You scored ${bossScore} / ${bossQuestions.length} questions correctly.`;
+  const xpEarned = bossScore * 12;
+  addXP(xpEarned, 'Boss Challenge');
+  document.getElementById('boss-xp-msg').textContent = `+${xpEarned} XP earned!`;
+}
+
+function resetBoss() {
+  document.getElementById('boss-result').classList.remove('show');
+  document.getElementById('boss-intro').style.display = 'block';
+}
+</script>
+</body>
+</html>
